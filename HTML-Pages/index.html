@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Metaheuristik: ALO &amp; GOA untuk Cloud Task Scheduling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.tailwindcss.com/3.4.5"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Space Grotesk','sans-serif'],mono:['JetBrains Mono','monospace']}}}}</script>
+</head>
+<body>
+<canvas id="bg"></canvas><div class="vignette"></div>
+<div id="progress"></div>
+<div id="brand"><b>SOKA</b> · Kelompok 2 · Metaheuristik</div>
+<div id="hint"><kbd>←</kbd> <kbd>→</kbd> pindah slide · <kbd>F</kbd> layar penuh</div>
+
+<main id="deck">
+
+<!-- 1 ============================ JUDUL -->
+<section class="slide" data-id="title" data-title="Judul" data-shape="1">
+ <div class="wrap">
+  <p class="eyebrow rv">Kelompok 2 · SOKA</p>
+  <h1 class="big rv mt-3">Algoritma <span class="grad">Metaheuristik</span></h1>
+  <p class="rv mt-5 max-w-2xl text-xl text-slate-300 leading-relaxed">Ant Lion Optimizer &amp; Grasshopper Optimization Algorithm — dan bagaimana keduanya membantu <b class="text-white">penjadwalan tugas (task scheduling) di cloud computing</b>.</p>
+  <div class="rv mt-8 flex flex-wrap gap-3">
+   <button class="btn primary pulse" onclick="goSlide(1)">Mulai presentasi →</button>
+   <button class="btn" onclick="goSlideId('arena')">Langsung ke simulasi ALO vs GOA</button>
+  </div>
+  <div class="rv mt-10 glass pad max-w-2xl">
+   <p class="mono text-xs text-slate-400 mb-3 tracking-widest">ANGGOTA KELOMPOK 2</p>
+   <div class="grid sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm text-slate-200">
+    <div>Revalina Erica Permatasari <span class="mono text-slate-500">5027241007</span></div>
+    <div>Clarissa Aydin Rahmazea <span class="mono text-slate-500">5027241014</span></div>
+    <div>Muhammad Afrizan Rasya <span class="mono text-slate-500">5027241048</span></div>
+    <div>Angga Firmansyah <span class="mono text-slate-500">5027241062</span></div>
+    <div>Jofanka Al-kautsar Pangestu Abady <span class="mono text-slate-500">5027241107</span></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 2 ============================ ALUR -->
+<section class="slide" data-id="agenda" data-title="Alur" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">Peta presentasi</p>
+  <h2 class="title rv">Alur yang akan kita lewati</h2>
+  <div class="grid md:grid-cols-2 gap-3 mt-3">
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-sky-400 transition" onclick="goSlideId('meta')"><span class="num">01</span><div><b>Apa itu algoritma metaheuristik?</b><p class="text-sm text-slate-400">Definisi, ciri, dan cara kerja umumnya</p></div></button>
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-sky-400 transition" onclick="goSlideId('flow')"><span class="num">02</span><div><b>Cara kerja metaheuristik</b><p class="text-sm text-slate-400">Siklus populasi → evaluasi → update, eksplorasi vs eksploitasi</p></div></button>
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-amber-400 transition" onclick="goSlideId('two')"><span class="num">03</span><div><b>Dua contoh algoritma</b><p class="text-sm text-slate-400">Ant Lion Optimizer (ALO) &amp; Grasshopper Optimization Algorithm (GOA)</p></div></button>
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-amber-400 transition" onclick="goSlideId('alo-viz')"><span class="num">04</span><div><b>Cara kerja ALO &amp; GOA — interaktif</b><p class="text-sm text-slate-400">Visualisasi langkah demi langkah di atas peta fitness</p></div></button>
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-emerald-400 transition" onclick="goSlideId('cloud')"><span class="num">05</span><div><b>Cloud task scheduling &amp; penerapan dunia nyata</b><p class="text-sm text-slate-400">Masalahnya, encoding solusi, simulasi ALO vs GOA, aplikasi lain</p></div></button>
+   <button class="rv glass pad text-left flex gap-4 items-center hover:border-emerald-400 transition" onclick="goSlideId('refs')"><span class="num">06</span><div><b>Sumber paper &amp; kesimpulan</b><p class="text-sm text-slate-400">Mirjalili (2015), Saremi dkk. (2017), Abualigah &amp; Diabat (2021), Zhao dkk. (2019)</p></div></button>
+  </div>
+ </div>
+</section>
+
+<!-- 3 ============================ APA ITU METAHEURISTIK -->
+<section class="slide" data-id="meta" data-title="Apa itu metaheuristik" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">01 · Konsep dasar</p>
+  <h2 class="title rv">Apa itu algoritma <span class="grad">metaheuristik</span>?</h2>
+  <div class="grid lg:grid-cols-5 gap-6 items-stretch">
+   <div class="lg:col-span-2">
+    <p class="lead rv">Metaheuristik adalah <b class="text-white">strategi pencarian tingkat tinggi</b> yang tidak bergantung pada satu jenis masalah. Ia memakai <b class="text-white">aturan acak yang terinspirasi alam</b> untuk mencari solusi yang <i>cukup baik</i> dalam waktu wajar — tanpa jaminan optimal.</p>
+    <ul class="list mt-3">
+     <li class="rv"><span class="num">1</span><span><b class="text-white">Tanpa gradien</b> — hanya butuh nilai fungsi (fitness), cocok untuk masalah tak mulus / kombinatorial.</span></li>
+     <li class="rv"><span class="num">2</span><span><b class="text-white">Menghindari local optima</b> — unsur acak + banyak agen membuat pencarian tidak mudah terjebak.</span></li>
+     <li class="rv"><span class="num">3</span><span><b class="text-white">Fleksibel</b> — satu algoritma dipakai ulang untuk banyak masalah; cukup ganti fungsi fitness.</span></li>
+     <li class="rv"><span class="num">4</span><span><b class="text-white">Cocok untuk masalah NP-hard</b> seperti task scheduling, saat mencoba semua kemungkinan mustahil.</span></li>
+    </ul>
+    <div class="flex gap-2 flex-wrap mt-2 rv"><span class="src">Mirjalili 2015</span><span class="src">Saremi dkk. 2017</span><span class="src">Abualigah &amp; Diabat 2021</span></div>
+   </div>
+   <div class="lg:col-span-3 rv">
+    <div class="glass pad">
+     <div class="flex items-center justify-between flex-wrap gap-2 mb-2">
+      <div><b>Demo: pencarian lokal vs populasi</b><p class="text-xs text-slate-400">Minimasi f(x) — cari lembah terdalam (bintang emas).</p></div>
+      <div class="flex gap-2"><button id="land-run" class="btn primary sm">▶ Jalankan</button><button id="land-new" class="btn sm">↻ Titik awal baru</button></div>
+     </div>
+     <div style="height:300px"><canvas id="cv-land" class="cv"></canvas></div>
+     <div class="legend flex flex-wrap gap-4 text-xs text-slate-300 mt-2"><span><i style="background:#fb7185"></i>Hill-climbing (1 agen, serakah)</span><span><i style="background:#38bdf8"></i>Metaheuristik (populasi, acak + berbagi info)</span><span><i style="background:#fbbf24"></i>Optimum global</span></div>
+     <p id="land-msg" class="cap mt-2">Tekan <b>Jalankan</b>. Agen merah hanya turun ke lembah terdekat; populasi biru menyebar dulu (eksplorasi) lalu mengerucut (eksploitasi).</p>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 4 ============================ CARA KERJA -->
+<section class="slide" data-id="flow" data-title="Cara kerja metaheuristik" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">02 · Cara kerja (umum)</p>
+  <h2 class="title rv">Satu siklus yang diulang sampai <span class="grad">cukup baik</span></h2>
+  <div class="grid lg:grid-cols-2 gap-6">
+   <div>
+    <div id="flow-steps" class="grid gap-2.5">
+     <div class="flow-step rv" data-i="0"><span class="num">1</span><div><b>Inisialisasi populasi acak</b><p class="text-xs text-slate-400">N kandidat solusi disebar acak di ruang pencarian.</p></div></div>
+     <div class="flow-step rv" data-i="1"><span class="num">2</span><div><b>Evaluasi fitness</b><p class="text-xs text-slate-400">Hitung seberapa bagus tiap solusi lewat fungsi tujuan f(x).</p></div></div>
+     <div class="flow-step rv" data-i="2"><span class="num">3</span><div><b>Perbarui posisi (aturan alam)</b><p class="text-xs text-slate-400">Di sinilah algoritma berbeda: semut–antlion (ALO), belalang (GOA), dll.</p></div></div>
+     <div class="flow-step rv" data-i="3"><span class="num">4</span><div><b>Simpan yang terbaik (elitism)</b><p class="text-xs text-slate-400">Solusi terbaik sejauh ini tidak boleh hilang.</p></div></div>
+     <div class="flow-step rv" data-i="4"><span class="num">5</span><div><b>Berhenti? Jika belum, ulangi dari langkah 2</b><p class="text-xs text-slate-400">Kriteria: jumlah iterasi maksimum / konvergen.</p></div></div>
+    </div>
+   </div>
+   <div class="glass pad rv">
+    <b>Eksplorasi → Eksploitasi</b>
+    <p class="text-xs text-slate-400 mb-2">Geser iterasi: awalnya agen menyebar luas (eksplorasi), akhirnya merapat ke solusi terbaik (eksploitasi).</p>
+    <div style="height:280px"><canvas id="cv-flow" class="cv"></canvas></div>
+    <div class="ctl mt-2"><span>iterasi</span><input id="flow-t" type="range" min="0" max="100" value="0"><b id="flow-tv">0</b></div>
+    <div class="phase mt-3"><span id="flow-bar"></span></div>
+    <div class="flex justify-between text-[11px] mono text-slate-400 mt-1"><span>eksplorasi (global)</span><span>eksploitasi (lokal)</span></div>
+    <label class="ctl mt-2"><input id="flow-auto" type="checkbox" checked> animasi otomatis</label>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 5 ============================ DUA ALGORITMA -->
+<section class="slide" data-id="two" data-title="Dua algoritma" data-shape="2">
+ <div class="wrap">
+  <p class="eyebrow rv">03 · Dua contoh algoritma (berdasarkan paper)</p>
+  <h2 class="title rv">Singa-semut dan belalang</h2>
+  <div class="grid md:grid-cols-2 gap-5 mt-2">
+   <div class="glass pad rv theme-alo" style="border-color:rgba(251,191,36,.35)">
+    <div class="flex items-center gap-3"><span class="text-4xl">🐜</span><div><h3 class="text-2xl font-bold grad-alo">Ant Lion Optimizer (ALO)</h3><p class="text-xs text-slate-400">Mirjalili (2015), <i>Advances in Engineering Software</i></p></div></div>
+    <p class="lead mt-3">Terinspirasi cara <b class="text-white">singa-semut (antlion)</b> berburu: menggali perangkap berbentuk corong di pasir, semut berjalan acak lalu terjebak; singa-semut memangsa dan membangun ulang perangkap.</p>
+    <ul class="mt-3 text-sm text-slate-300 space-y-1"><li>• Dua populasi: <b>semut</b> (pencari) &amp; <b>antlion</b> (solusi bagus)</li><li>• Hanya sedikit parameter — mudah dipakai</li><li>• Versi cloud: <b>MALO</b> = ALO + elite-based Differential Evolution</li></ul>
+    <div class="flex flex-wrap gap-2 mt-4"><a class="src" target="_blank" href="https://doi.org/10.1016/j.advengsoft.2015.01.010">DOI · algoritma asli</a><a class="src" target="_blank" href="https://doi.org/10.1007/s10586-020-03075-5">DOI · Abualigah &amp; Diabat 2021</a></div>
+    <button class="btn primary mt-4 theme-alo" onclick="goSlideId('alo')">Lihat cara kerja ALO →</button>
+   </div>
+   <div class="glass pad rv theme-goa" style="border-color:rgba(52,211,153,.35)">
+    <div class="flex items-center gap-3"><span class="text-4xl">🦗</span><div><h3 class="text-2xl font-bold grad-goa">Grasshopper Optimization (GOA)</h3><p class="text-xs text-slate-400">Saremi, Mirjalili &amp; Lewis (2017), <i>Advances in Engineering Software</i></p></div></div>
+    <p class="lead mt-3">Terinspirasi <b class="text-white">perilaku kawanan belalang</b>: tarik–menarik &amp; tolak–menolak antar belalang yang saling berinteraksi sambil bergerak menuju sumber makanan (target).</p>
+    <ul class="mt-3 text-sm text-slate-300 space-y-1"><li>• Satu populasi; tiap agen dipengaruhi semua agen lain</li><li>• Fungsi sosial s(r): tolak / nyaman / tarik</li><li>• Koefisien c menurun → eksplorasi ke eksploitasi</li></ul>
+    <div class="flex flex-wrap gap-2 mt-4"><a class="src" target="_blank" href="https://doi.org/10.1016/j.advengsoft.2017.01.004">DOI · algoritma asli</a><a class="src" target="_blank" href="https://doi.org/10.24507/ijicic.15.05.1967">DOI · Zhao dkk. 2019</a></div>
+    <button class="btn primary mt-4 theme-goa" onclick="goSlideId('goa')">Lihat cara kerja GOA →</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 6 ============================ ALO TEORI -->
+<section class="slide theme-alo" data-id="alo" data-theme="alo" data-title="ALO: cara kerja" data-shape="2">
+ <div class="wrap">
+  <p class="eyebrow rv">ALO · Ant Lion Optimizer</p>
+  <h2 class="title rv">Enam mekanisme perburuan singa-semut</h2>
+  <div class="grid lg:grid-cols-2 gap-6">
+   <ul class="list rv">
+    <li><span class="num">1</span><span><b class="text-white">Semut berjalan acak</b> mencari makanan — ini langkah <i>eksplorasi</i>.</span></li>
+    <li><span class="num">2</span><span><b class="text-white">Membangun perangkap</b>: antlion dipilih lewat <i>roulette wheel</i> — yang fitness-nya lebih bagus lebih mungkin terpilih.</span></li>
+    <li><span class="num">3</span><span><b class="text-white">Semut terperangkap</b>: jalan acak dibatasi di sekitar antlion terpilih (dan elite).</span></li>
+    <li><span class="num">4</span><span><b class="text-white">Perangkap menyempit</b>: radius jalan acak mengecil tiap iterasi (rasio <i>I</i> membesar) → eksploitasi.</span></li>
+    <li><span class="num">5</span><span><b class="text-white">Menangkap mangsa &amp; membangun ulang</b>: jika semut lebih baik dari antlion, antlion pindah ke posisi semut.</span></li>
+    <li><span class="num">6</span><span><b class="text-white">Elitisme</b>: antlion terbaik (elite) memengaruhi semua semut, tidak pernah hilang.</span></li>
+   </ul>
+   <div class="rv">
+    <div class="glass pad">
+     <p class="text-xs text-slate-400 mono tracking-widest mb-1">RUMUS INTI</p>
+     <div class="formula">$$X(t)=[0,\ \mathrm{cumsum}(2r(t_1)-1),\ \dots,\ \mathrm{cumsum}(2r(t_T)-1)]$$</div>
+     <p class="text-xs text-slate-400 -mt-1">Jalan acak: tiap langkah +1 atau −1 (r = 0 atau 1 acak).</p>
+     <div class="formula">$$c^t=\dfrac{c^t}{I},\qquad d^t=\dfrac{d^t}{I}\quad(\text{perangkap menyempit})$$</div>
+     <div class="formula">$$X_i^t=\dfrac{(X_i^t-a_i)(d_i^t-c_i^t)}{b_i-a_i}+c_i^t\quad(\text{normalisasi ke batas})$$</div>
+     <div class="formula">$$\mathrm{Ant}_i^t=\dfrac{R_A^t+R_E^t}{2}$$</div>
+     <p class="text-xs text-slate-400 -mt-1">R<sub>A</sub>: jalan acak sekitar antlion terpilih (roulette), R<sub>E</sub>: sekitar elite.</p>
+     <div class="formula">$$f(\mathrm{Ant}_i^t) < f(\mathrm{Antlion}_j^t) \;\Longrightarrow\; \mathrm{Antlion}_j^{t+1}=\mathrm{Ant}_i^t$$</div>
+    </div>
+    <button class="btn primary mt-3" onclick="goSlideId('alo-viz')">Lihat visualisasinya →</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 7 ============================ ALO VIZ -->
+<section class="slide theme-alo" data-id="alo-viz" data-theme="alo" data-title="ALO: visualisasi" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">ALO · visualisasi interaktif</p>
+  <h2 class="title rv" style="margin-bottom:.4rem">Saksikan semut <span class="grad-alo">terjebak</span> di perangkap</h2>
+  <div class="grid lg:grid-cols-3 gap-4">
+   <div class="lg:col-span-2 glass pad rv">
+    <div style="height:min(56vh,520px)"><canvas id="cv-alo" class="cv"></canvas></div>
+    <div class="phase mt-2"><span id="alo-ph"></span></div>
+    <p id="alo-cap" class="cap mt-2"></p>
+   </div>
+   <div class="grid gap-3 content-start rv">
+    <div class="grid grid-cols-2 gap-2">
+     <div class="stat"><small>iterasi</small><b id="alo-it">0</b></div>
+     <div class="stat"><small>rasio I</small><b id="alo-I">1</b></div>
+     <div class="stat"><small>best f(x)</small><b id="alo-best" style="color:var(--am)">–</b></div>
+     <div class="stat"><small>antlion diganti</small><b id="alo-rep">0</b></div>
+    </div>
+    <div class="glass pad grid gap-2.5">
+     <div class="flex gap-2 flex-wrap"><button id="alo-play" class="btn primary sm">⏸ Jeda</button><button id="alo-step" class="btn sm">⏭ 1 iterasi</button><button id="alo-reset" class="btn sm">↻ Reset</button></div>
+     <label class="ctl"><span>kecepatan</span><input id="alo-speed" type="range" min="0.25" max="8" step="0.25" value="1"><b id="alo-speedv">1×</b></label>
+     <label class="ctl"><span>populasi</span><input id="alo-n" type="range" min="5" max="40" value="14"><b id="alo-nv">14</b></label>
+     <label class="ctl"><input id="alo-walks" type="checkbox" checked> jejak jalan acak</label>
+     <label class="ctl"><input id="alo-trap" type="checkbox" checked> lingkaran perangkap (batas jalan acak)</label>
+    </div>
+    <div class="glass pad legend text-xs text-slate-300 grid gap-1.5">
+     <span><svg width="12" height="12" class="inline mr-1.5"><polygon points="6,0 12,11 0,11" fill="#fbbf24"/></svg>Antlion (perangkap)</span>
+     <span><i style="background:#f8fafc"></i>Semut (berjalan acak)</span>
+     <span><svg width="12" height="12" class="inline mr-1.5"><polygon points="6,0 7.6,4.4 12,4.6 8.5,7.3 9.8,12 6,9.2 2.2,12 3.5,7.3 0,4.6 4.4,4.4" fill="#f43f5e"/></svg>Elite (terbaik)</span>
+     <span><i style="background:#2dd4bf"></i>Antlion baru (semut menang)</span>
+     <span class="mono text-[11px] text-slate-400">Peta: fungsi Rastrigin (banyak lembah). Biru gelap = nilai f rendah (bagus), emas = tinggi. Tanda + putih = optimum global.</span>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 8 ============================ GOA TEORI -->
+<section class="slide theme-goa" data-id="goa" data-theme="goa" data-title="GOA: cara kerja" data-shape="1">
+ <div class="wrap">
+  <p class="eyebrow rv">GOA · Grasshopper Optimization Algorithm</p>
+  <h2 class="title rv">Tarik, tolak, dan zona <span class="grad-goa">nyaman</span></h2>
+  <div class="grid lg:grid-cols-2 gap-6">
+   <div>
+    <p class="lead rv">Belalang muda (nimfa) bergerak pelan &amp; kecil → <i>eksploitasi</i>. Belalang dewasa melompat jauh → <i>eksplorasi</i>. Posisi belalang <i>i</i> ditentukan oleh <b class="text-white">interaksi sosial</b> dengan belalang lain plus tarikan ke <b class="text-white">target</b> (solusi terbaik).</p>
+    <div class="formula rv">$$X_i=c\left(\sum_{\substack{j=1\\ j\ne i}}^{N} c\,\dfrac{ub-lb}{2}\,s\!\left(|x_j-x_i|\right)\dfrac{x_j-x_i}{d_{ij}}\right)+\hat T_d$$</div>
+    <div class="formula rv">$$s(r)=f\,e^{-r/l}-e^{-r},\qquad c=c_{max}-t\,\dfrac{c_{max}-c_{min}}{T}$$</div>
+    <ul class="list mt-2">
+     <li class="rv"><span class="num">s</span><span><b class="text-white">s(r) &lt; 0</b> → tolak (terlalu dekat) · <b class="text-white">s(r) = 0</b> → zona nyaman · <b class="text-white">s(r) &gt; 0</b> → tarik.</span></li>
+     <li class="rv"><span class="num">c</span><span>Koefisien <b class="text-white">c menurun</b> tiap iterasi: mempersempit zona tarik/tolak dan menggeser fokus dari eksplorasi ke eksploitasi.</span></li>
+     <li class="rv"><span class="num">T</span><span>Gravitasi &amp; angin diabaikan; target <b class="text-white">T̂</b> = solusi terbaik sejauh ini.</span></li>
+    </ul>
+   </div>
+   <div class="glass pad rv">
+    <b>Fungsi sosial s(r) — ubah parameternya!</b>
+    <p class="text-xs text-slate-400 mb-1">Standar paper: f = 0,5 dan l = 1,5.</p>
+    <div style="height:260px"><canvas id="cv-s" class="cv"></canvas></div>
+    <label class="ctl mt-2"><span>f (intensitas tarik)</span><input id="goa-f" type="range" min="0.1" max="1.5" step="0.05" value="0.5"><b id="goa-fv">0.5</b></label>
+    <label class="ctl mt-1"><span>l (skala panjang)</span><input id="goa-l" type="range" min="1.05" max="4" step="0.05" value="1.5"><b id="goa-lv">1.5</b></label>
+    <p id="goa-zone" class="cap mt-2"></p>
+    <button class="btn primary mt-2" onclick="goSlideId('goa-viz')">Lihat visualisasinya →</button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 9 ============================ GOA VIZ -->
+<section class="slide theme-goa" data-id="goa-viz" data-theme="goa" data-title="GOA: visualisasi" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">GOA · visualisasi interaktif</p>
+  <h2 class="title rv" style="margin-bottom:.4rem">Kawanan belalang <span class="grad-goa">melompat</span> menuju target</h2>
+  <div class="grid lg:grid-cols-3 gap-4">
+   <div class="lg:col-span-2 glass pad rv">
+    <div style="height:min(56vh,520px)"><canvas id="cv-goa" class="cv"></canvas></div>
+    <div class="phase mt-2"><span id="goa-ph"></span></div>
+    <p id="goa-cap" class="cap mt-2"></p>
+   </div>
+   <div class="grid gap-3 content-start rv">
+    <div class="grid grid-cols-2 gap-2">
+     <div class="stat"><small>iterasi</small><b id="goa-it">0</b></div>
+     <div class="stat"><small>koefisien c</small><b id="goa-c">1</b></div>
+     <div class="stat"><small>best f(x)</small><b id="goa-best" style="color:var(--gr)">–</b></div>
+     <div class="stat"><small>rata² jarak ke T</small><b id="goa-spread">–</b></div>
+    </div>
+    <div class="glass pad grid gap-2.5">
+     <div class="flex gap-2 flex-wrap"><button id="goa-play" class="btn primary sm">⏸ Jeda</button><button id="goa-step" class="btn sm">⏭ 1 iterasi</button><button id="goa-reset" class="btn sm">↻ Reset</button></div>
+     <label class="ctl"><span>kecepatan</span><input id="goa-speed" type="range" min="0.25" max="8" step="0.25" value="1"><b id="goa-speedv">1×</b></label>
+     <label class="ctl"><span>populasi</span><input id="goa-n" type="range" min="5" max="40" value="16"><b id="goa-nv">16</b></label>
+     <label class="ctl"><input id="goa-forces" type="checkbox" checked> panah gaya sosial (c·Σ s(r))</label>
+     <label class="ctl"><input id="goa-trail" type="checkbox" checked> jejak lompatan</label>
+    </div>
+    <div class="glass pad legend text-xs text-slate-300 grid gap-1.5">
+     <span><i style="background:#a7f3d0"></i>Belalang</span>
+     <span><svg width="12" height="12" class="inline mr-1.5"><polygon points="6,0 7.6,4.4 12,4.6 8.5,7.3 9.8,12 6,9.2 2.2,12 3.5,7.3 0,4.6 4.4,4.4" fill="#fde047"/></svg>Target T̂ (terbaik sejauh ini)</span>
+     <span><i style="background:#fb7185"></i>Vektor gaya sosial c·Σ s(r) (dari T̂ ke posisi tujuan)</span>
+     <span class="mono text-[11px] text-slate-400">Posisi baru = T̂ + c · (jumlah gaya sosial). Karena c mengecil, lompatan makin pendek.</span>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 10 ============================ CLOUD -->
+<section class="slide" data-id="cloud" data-title="Cloud task scheduling" data-shape="1">
+ <div class="wrap">
+  <p class="eyebrow rv">05 · Penerapan: cloud task scheduling</p>
+  <h2 class="title rv">Siapa mengerjakan apa, di <span class="grad">VM</span> mana?</h2>
+  <div class="grid lg:grid-cols-5 gap-6">
+   <div class="lg:col-span-3">
+    <div class="glass pad rv">
+     <div class="pipe" id="pipe">
+      <div class="absolute inset-0 flex items-center justify-between text-center text-xs">
+       <div class="glass px-3 py-3"><div class="text-2xl">👥</div>Pengguna</div>
+       <div class="glass px-3 py-3"><div class="text-2xl">📦</div>Antrean tugas<br><span class="text-slate-400">T1 … Tn</span></div>
+       <div class="glass px-3 py-3" style="border-color:var(--cy)"><div class="text-2xl">🧠</div><b>Scheduler</b><br><span class="text-sky-300">metaheuristik</span></div>
+       <div class="glass px-3 py-3"><div class="text-2xl">🖥️</div>VM1…VMm<br><span class="text-slate-400">heterogen</span></div>
+      </div>
+      <i class="pkt" style="background:#38bdf8;animation-delay:0s"></i><i class="pkt" style="background:#fbbf24;animation-delay:.8s"></i><i class="pkt" style="background:#34d399;animation-delay:1.6s"></i><i class="pkt" style="background:#f472b6;animation-delay:2.4s"></i><i class="pkt" style="background:#a78bfa;animation-delay:3.2s"></i>
+     </div>
+    </div>
+    <ul class="list mt-3">
+     <li class="rv"><span class="num">!</span><span>Tugas punya <b class="text-white">panjang berbeda</b> (MI), VM punya <b class="text-white">kecepatan berbeda</b> (MIPS). Waktu eksekusi tugas j di VM k = L<sub>j</sub> / S<sub>k</sub>.</span></li>
+     <li class="rv"><span class="num">🎯</span><span>Tujuan (Abualigah &amp; Diabat, 2021): <b class="text-white">minimalkan makespan</b> dan <b class="text-white">maksimalkan resource utilization</b>. Masalahnya <b class="text-white">NP-complete</b>.</span></li>
+     <li class="rv"><span class="num">⚙️</span><span>Penjadwal sederhana (round-robin, FCFS) tidak melihat panjang tugas &amp; kecepatan VM → VM lambat jadi bottleneck.</span></li>
+    </ul>
+    <div class="formula rv">$$\text{makespan}=\max_{k}\sum_{j:\,a_j=k}\dfrac{L_j}{S_k},\qquad \text{utilization}=\dfrac{\sum_k \text{load}_k}{m\cdot \text{makespan}}$$</div>
+   </div>
+   <div class="lg:col-span-2 glass pad rv">
+    <b>Ledakan kemungkinan jadwal</b>
+    <p class="text-xs text-slate-400 mb-2">Untuk n tugas &amp; m VM ada m<sup>n</sup> jadwal berbeda.</p>
+    <label class="ctl"><span>tugas n</span><input id="sp-n" type="range" min="2" max="200" value="10"><b id="sp-nv">10</b></label>
+    <label class="ctl mt-1"><span>VM m</span><input id="sp-v" type="range" min="2" max="20" value="3"><b id="sp-vv">3</b></label>
+    <div class="stat mt-3"><small>jumlah jadwal yang mungkin</small><b id="sp-out" class="text-2xl" style="color:var(--am)">59.049</b></div>
+    <p id="sp-note" class="cap mt-2"></p>
+    <p class="text-xs text-slate-400 mt-1">→ Brute-force mustahil, maka dipakai <b class="text-slate-200">metaheuristik</b>.</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 11 ============================ ENCODING -->
+<section class="slide" data-id="encode" data-title="Encoding solusi" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">05 · Dari agen ke jadwal</p>
+  <h2 class="title rv">Satu agen = satu <span class="grad">jadwal lengkap</span></h2>
+  <div class="grid lg:grid-cols-5 gap-5">
+   <div class="lg:col-span-2">
+    <ul class="list">
+     <li class="rv"><span class="num">1</span><span><b class="text-white">Posisi agen</b> adalah vektor x dengan n dimensi (satu dimensi per tugas), nilai di [0, m).</span></li>
+     <li class="rv"><span class="num">2</span><span><b class="text-white">Decode</b>: VM tugas j = ⌊x<sub>j</sub>⌋. Algoritma tetap bekerja di ruang kontinu.</span></li>
+     <li class="rv"><span class="num">3</span><span><b class="text-white">Fitness</b> = makespan jadwal hasil decode (lebih kecil lebih baik).</span></li>
+     <li class="rv"><span class="num">4</span><span>ALO / GOA memperbarui x → decode → hitung fitness → ulangi.</span></li>
+    </ul>
+    <div class="glass pad rv mt-2">
+     <p class="text-sm"><b>Coba sendiri:</b> klik chip tugas untuk memindahkannya ke VM berikutnya, atau biarkan algoritma yang mencari.</p>
+     <div class="flex gap-2 flex-wrap mt-3"><button id="map-alo" class="btn primary sm">🐜 Biarkan ALO mencari</button><button id="map-goa" class="btn sm">🦗 Biarkan GOA mencari</button><button id="map-reset" class="btn sm">↻ Acak ulang</button></div>
+    </div>
+   </div>
+   <div class="lg:col-span-3 glass pad rv">
+    <div class="flex items-center justify-between flex-wrap gap-2"><b>8 tugas · 3 VM</b><span id="map-stat" class="mono text-xs text-slate-300"></span></div>
+    <div id="map-info" class="mono text-[11px] text-slate-400 mt-1"></div>
+    <div id="map-chips" class="flex flex-wrap gap-2 mt-3"></div>
+    <div id="map-vec" class="formula mono text-xs mt-3" style="white-space:nowrap"></div>
+    <div style="height:210px"><canvas id="cv-map" class="cv"></canvas></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 12 ============================ ARENA -->
+<section class="slide" data-id="arena" data-title="Arena ALO vs GOA" data-shape="0">
+ <div class="wrap">
+  <p class="eyebrow rv">05 · Simulasi nyata di browser</p>
+  <h2 class="title rv" style="margin-bottom:.4rem">Arena: <span class="grad-alo">ALO</span> vs <span class="grad-goa">GOA</span> pada task scheduling</h2>
+  <div class="grid lg:grid-cols-3 gap-4">
+   <div class="lg:col-span-2 grid gap-3">
+    <div class="glass pad rv"><div style="height:210px"><canvas id="cv-conv" class="cv"></canvas></div>
+     <div class="legend flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300 mt-1"><span><i style="background:#fbbf24"></i>ALO</span><span><i style="background:#34d399"></i>GOA</span><span><i style="background:#f472b6"></i>MALO-ringkas (ALO + DE elite)</span><span><i style="background:#64748b"></i>Random search</span><span class="text-slate-400">garis putus: batas bawah ideal (beban terbagi sempurna)</span></div></div>
+    <div class="glass pad rv"><div class="flex items-center justify-between flex-wrap gap-2 mb-1"><b class="text-sm">Jadwal terbaik (Gantt) milik:</b><div id="ar-sel" class="flex gap-1.5"><button data-k="alo" class="btn sm on">ALO</button><button data-k="goa" class="btn sm">GOA</button><button data-k="malo" class="btn sm">MALO</button><button data-k="rr" class="btn sm">Round-Robin</button></div></div>
+     <div style="height:min(26vh,230px)"><canvas id="cv-gantt" class="cv"></canvas></div></div>
+   </div>
+   <div class="grid gap-3 content-start rv">
+    <div class="glass pad grid gap-2.5">
+     <label class="ctl"><span>tugas</span><input id="ar-t" type="range" min="10" max="150" step="5" value="40"><b id="ar-tv">40</b></label>
+     <label class="ctl"><span>VM</span><input id="ar-v" type="range" min="3" max="12" value="6"><b id="ar-vv">6</b></label>
+     <label class="ctl"><span>iterasi</span><input id="ar-it" type="range" min="30" max="300" step="10" value="100"><b id="ar-itv">100</b></label>
+     <label class="ctl"><span>populasi</span><input id="ar-n" type="range" min="10" max="50" step="2" value="24"><b id="ar-nv">24</b></label>
+     <div class="flex gap-2"><button id="ar-run" class="btn primary sm">▶ Jalankan</button><button id="ar-new" class="btn sm">🎲 Masalah baru</button></div>
+     <div class="phase"><span id="ar-ph"></span></div>
+    </div>
+    <div class="glass pad"><table class="t"><thead><tr><th>algoritma</th><th>makespan</th><th>util.</th><th>vs RR</th></tr></thead><tbody id="ar-tb"></tbody></table>
+     <p class="text-[11px] text-slate-400 mt-2">Semua algoritma memakai iterasi &amp; populasi sama (decode: VM = ⌊x⌋). Ini simulasi sederhana kami, <b>bukan</b> angka dari paper; hasil bervariasi tiap run (stokastik) — coba beberapa kali dan ubah ukuran masalah. MALO-ringkas = ALO + DE elite, versi ilustratif.</p></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 13 ============================ PAPER -->
+<section class="slide" data-id="paper" data-title="Isi paper" data-shape="2">
+ <div class="wrap">
+  <p class="eyebrow rv">05 · Algoritma untuk cloud task scheduling di paper</p>
+  <h2 class="title rv">Apa yang dilakukan paper-paper tersebut?</h2>
+  <div class="grid md:grid-cols-2 gap-5">
+   <div class="glass pad rv" style="border-color:rgba(251,191,36,.35)">
+    <span class="tag">Abualigah &amp; Diabat (2021) · Cluster Computing</span>
+    <h3 class="text-xl font-bold mt-2 grad-alo">Hybrid ALO untuk multi-objective task scheduling</h3>
+    <ul class="mt-3 text-sm text-slate-300 space-y-2">
+     <li>• Algoritma usulan: <b class="text-white">MALO</b> — <i>antlion optimizer</i> yang digabung <b class="text-white">elite-based Differential Evolution</b> sebagai <i>local search</i>.</li>
+     <li>• Alasan: ALO murni kurang kuat di eksploitasi &amp; bisa terjebak local optima; DE memperbaiki solusi di sekitar elite.</li>
+     <li>• Tujuan: <b class="text-white">minimalkan makespan</b> &amp; <b class="text-white">maksimalkan resource utilization</b> saat menjadwalkan tugas ke VM.</li>
+     <li>• Uji: simulator <b class="text-white">CloudSim</b>, dataset sintetis dan <i>real trace</i>, dibanding optimizer lain.</li>
+     <li>• Klaim paper: unggul dari pembanding, konvergensi lebih cepat pada ruang pencarian besar, signifikan secara uji-t.</li>
+    </ul>
+    <a class="src mt-3" target="_blank" href="https://doi.org/10.1007/s10586-020-03075-5">doi.org/10.1007/s10586-020-03075-5</a>
+   </div>
+   <div class="glass pad rv" style="border-color:rgba(52,211,153,.35)">
+    <span class="tag">Zhao, Ni, Feng, Song &amp; Zhu (2019) · IJICIC 15(5)</span>
+    <h3 class="text-xl font-bold mt-2 grad-goa">GOA untuk penjadwalan tugas di cloud</h3>
+    <ul class="mt-3 text-sm text-slate-300 space-y-2">
+     <li>• Memakai kerangka <b class="text-white">GOA</b> (Saremi dkk., 2017) untuk memetakan tugas cloud ke sumber daya.</li>
+     <li>• Gagasan umum yang kita peragakan di simulasi: setiap belalang = satu jadwal; posisi kontinu di-<i>decode</i> menjadi indeks VM; fitness = makespan.</li>
+     <li>• Interaksi sosial antar-jadwal (tarik/tolak) menjaga keragaman solusi sambil perlahan menuju target terbaik.</li>
+    </ul>
+    <div class="mt-3 text-xs text-slate-400 border border-slate-700 rounded-xl p-3">Rincian eksperimen paper ini (parameter, dataset, angka hasil) dapat dibaca langsung di DOI berikut dan ditambahkan oleh presenter.</div>
+    <a class="src mt-3" target="_blank" href="https://doi.org/10.24507/ijicic.15.05.1967">doi.org/10.24507/ijicic.15.05.1967</a>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- 14 ============================ REAL WORLD -->
+<section class="slide" data-id="apps" data-title="Penerapan dunia nyata" data-shape="1">
+ <div class="wrap">
+  <p class="eyebrow rv">05 · Penerapan di dunia nyata</p>
+  <h2 class="title rv">Di mana lagi metaheuristik dipakai?</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+   <div class="glass pad appcard rv"><div class="text-3xl">☁️</div><b class="block mt-2">Cloud task scheduling</b><p class="text-sm text-slate-400 mt-1">Menjadwalkan ribuan tugas ke VM agar waktu selesai (makespan) singkat dan sumber daya terpakai efisien — fokus proyek ini.</p></div>
+   <div class="glass pad appcard rv"><div class="text-3xl">📡</div><b class="block mt-2">IoT &amp; edge/fog computing</b><p class="text-sm text-slate-400 mt-1">Memutuskan tugas diproses di perangkat, edge, atau cloud untuk menekan latensi dan energi baterai.</p></div>
+   <div class="glass pad appcard rv"><div class="text-3xl">🔋</div><b class="block mt-2">Data center hemat energi</b><p class="text-sm text-slate-400 mt-1">Konsolidasi VM &amp; penempatan beban agar server menganggur bisa dimatikan tanpa melanggar SLA.</p></div>
+   <div class="glass pad appcard rv"><div class="text-3xl">🚚</div><b class="block mt-2">Logistik &amp; penugasan tugas</b><p class="text-sm text-slate-400 mt-1">Penugasan pekerjaan/armada pada cloud logistics — GOA pernah diterapkan pada masalah task assignment tersebut.</p></div>
+   <div class="glass pad appcard rv"><div class="text-3xl">🛠️</div><b class="block mt-2">Desain rekayasa</b><p class="text-sm text-slate-400 mt-1">Optimasi struktur &amp; komponen (mis. desain baling-baling kapal pada paper ALO) di mana turunan fungsi sulit dihitung.</p></div>
+   <div class="glass pad appcard rv"><div class="text-3xl">🧠</div><b class="block mt-2">Machine learning</b><p class="text-sm text-slate-400 mt-1">Tuning hyper-parameter, feature selection, dan pelatihan jaringan saraf tanpa gradien.</p></div>
+  </div>
+  <div class="glass pad rv mt-4 text-sm text-slate-300"><b class="text-white">Pola yang sama:</b> definisikan <i>representasi solusi</i> + <i>fungsi fitness</i> → biarkan populasi mencari. Hanya dua bagian itu yang berganti antar masalah.</div>
+ </div>
+</section>
+
+<!-- 15 ============================ REFERENSI -->
+<section class="slide" data-id="refs" data-title="Kesimpulan & referensi" data-shape="1">
+ <div class="wrap">
+  <p class="eyebrow rv">06 · Penutup</p>
+  <h2 class="title rv">Kesimpulan &amp; <span class="grad">sumber paper</span></h2>
+  <div class="grid lg:grid-cols-2 gap-5">
+   <div class="glass pad rv">
+    <b>Poin utama</b>
+    <ul class="list mt-2 text-sm">
+     <li><span class="num">1</span><span>Metaheuristik = pencarian acak terarah berbasis populasi; ideal untuk masalah NP-hard.</span></li>
+     <li><span class="num">2</span><span><b class="text-white">ALO</b> menyempitkan jalan acak semut di sekitar antlion &amp; elite; <b class="text-white">GOA</b> memakai gaya sosial belalang yang melemah seiring c menurun.</span></li>
+     <li><span class="num">3</span><span>Pada task scheduling, agen = jadwal; decode posisi → VM; fitness = makespan (+ utilization).</span></li>
+     <li><span class="num">4</span><span>Hibridisasi (mis. ALO + DE → MALO) memperkuat eksploitasi dan mempercepat konvergensi.</span></li>
+    </ul>
+   </div>
+   <div class="glass pad rv">
+    <b>Referensi</b>
+    <ol class="mt-2 text-sm text-slate-300 space-y-3">
+     <li>Mirjalili, S. (2015). <i>The Ant Lion Optimizer.</i> Advances in Engineering Software. <a class="src" target="_blank" href="https://doi.org/10.1016/j.advengsoft.2015.01.010">doi:10.1016/j.advengsoft.2015.01.010</a></li>
+     <li>Saremi, S., Mirjalili, S., &amp; Lewis, A. (2017). <i>Grasshopper Optimisation Algorithm: Theory and application.</i> Advances in Engineering Software. <a class="src" target="_blank" href="https://doi.org/10.1016/j.advengsoft.2017.01.004">doi:10.1016/j.advengsoft.2017.01.004</a></li>
+     <li>Abualigah, L., &amp; Diabat, A. (2021). <i>A novel hybrid antlion optimization algorithm for multi-objective task scheduling problems in cloud computing environments.</i> Cluster Computing. <a class="src" target="_blank" href="https://doi.org/10.1007/s10586-020-03075-5">doi:10.1007/s10586-020-03075-5</a></li>
+     <li>Zhao, R., Ni, H., Feng, H., Song, Y., &amp; Zhu, X. (2019). Int. J. Innovative Computing, Information and Control, 15(5). <a class="src" target="_blank" href="https://doi.org/10.24507/ijicic.15.05.1967">doi:10.24507/ijicic.15.05.1967</a></li>
+    </ol>
+   </div>
+  </div>
+  <p class="rv text-center mt-6 text-xl grad font-semibold">Terima kasih — ada pertanyaan?</p>
+ </div>
+</section>
+
+</main>
+
+<div id="hud">
+ <button id="prev" class="navb" aria-label="Sebelumnya">‹</button>
+ <div id="dots"></div>
+ <span id="counter"></span>
+ <button id="next" class="navb" aria-label="Berikutnya">›</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="js/core.js"></script>
+<script src="js/viz-intro.js"></script>
+<script src="js/viz-alo.js"></script>
+<script src="js/viz-goa.js"></script>
+<script src="js/viz-sched.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+  // Render seluruh ekspresi LaTeX setelah KaTeX dan auto-render dimuat.
+  renderMathInElement(document.body, {
+    delimiters: [
+      { left: "$$", right: "$$", display: true },
+      { left: "$", right: "$", display: false }
+    ],
+    throwOnError: false
+  });
+</script>
+
+</body>
+</html>
