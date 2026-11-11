@@ -32,18 +32,21 @@
     }
     function draw() {
       const { ctx: c, w, h } = setup(cv); c.clearRect(0, 0, w, h);
+      // kartu kertas di dalam pelat gelap
+      c.fillStyle = '#FFFDF6'; c.fillRect(0, 0, w, h);
+      c.strokeStyle = 'rgba(41,35,23,.22)'; c.lineWidth = 1; c.strokeRect(3.5, 3.5, w - 7, h - 7);
       const X = x => 10 + ((x - X0) / (X1 - X0)) * (w - 20), Y = y => 12 + (1 - (y - Y0) / (Y1 - Y0)) * (h - 40);
       c.beginPath(); c.moveTo(X(X0), Y(Y1));
       for (let i = 0; i <= 300; i++) { const x = X0 + (i / 300) * (X1 - X0); c.lineTo(X(x), Y(f(x))); }
       c.lineTo(X(X1), Y(Y1)); c.closePath();
-      const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(56,189,248,.05)'); gr.addColorStop(1, 'rgba(56,189,248,.28)');
+      const gr = c.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(180,83,9,.05)'); gr.addColorStop(1, 'rgba(180,83,9,.16)');
       c.fillStyle = gr; c.fill();
       c.beginPath(); for (let i = 0; i <= 300; i++) { const x = X0 + (i / 300) * (X1 - X0); i ? c.lineTo(X(x), Y(f(x))) : c.moveTo(X(x), Y(f(x))); }
-      c.strokeStyle = 'rgba(226,232,240,.8)'; c.lineWidth = 2; c.stroke();
-      star(c, X(GLOBAL), Y(f(GLOBAL)) + 18, 9, '#fbbf24', '#fbbf24');
-      for (const a of pop) dot(c, X(a.x), Y(a.f) - 7, 5, '#38bdf8', 'rgba(255,255,255,.6)', '#38bdf8');
-      dot(c, X(hc.x), Y(f(hc.x)) - 8, 7, '#fb7185', '#fff', '#fb7185');
-      if (hc.stuck) { c.fillStyle = '#fb7185'; c.font = '600 12px "JetBrains Mono"'; c.textAlign = 'center'; c.fillText('terjebak!', X(hc.x), Y(f(hc.x)) - 24); }
+      c.strokeStyle = '#292317'; c.lineWidth = 2.4; c.stroke();
+      star(c, X(GLOBAL), Y(f(GLOBAL)) + 18, 9, '#D97706', 'rgba(217,119,6,.4)');
+      for (const a of pop) dot(c, X(a.x), Y(a.f) - 7, 4.6, '#0F766E', '#FFFDF6');
+      dot(c, X(hc.x), Y(f(hc.x)) - 8, 6.5, '#BE123C', '#FFFDF6');
+      if (hc.stuck) { c.fillStyle = '#BE123C'; c.font = '600 12px "JetBrains Mono"'; c.textAlign = 'center'; c.fillText('terjebak!', X(hc.x), Y(f(hc.x)) - 24); }
     }
     const L = loop(dt => {
       if (!running) { draw(); return; }
@@ -53,8 +56,8 @@
       if (t >= T && hc.stuck && !done) {
         done = true; running = false; btn.textContent = '▶ Jalankan';
         const ok = Math.abs(best.x - GLOBAL) < 0.5, hcok = Math.abs(hc.x - GLOBAL) < 0.5;
-        msg.innerHTML = (hcok ? '<b>Hill-climbing</b> kebetulan mulai dekat lembah terdalam. ' : '<b style="color:#fb7185">Hill-climbing</b> berhenti di lembah dangkal (local optimum). ') +
-          (ok ? '<b style="color:#38bdf8">Populasi</b> menemukan lembah terdalam (global optimum) ✔.' : '<b style="color:#38bdf8">Populasi</b> belum tepat di puncak optimum — metaheuristik tidak menjamin optimal, coba lagi.');
+        msg.innerHTML = (hcok ? '<b>Hill-climbing</b> kebetulan mulai dekat lembah terdalam. ' : '<b style="color:#BE123C">Hill-climbing</b> berhenti di lembah dangkal (local optimum). ') +
+          (ok ? '<b style="color:#0F766E">Populasi</b> menemukan lembah terdalam (global optimum) ✔.' : '<b style="color:#0F766E">Populasi</b> belum tepat di puncak optimum — metaheuristik tidak menjamin optimal, coba lagi.');
       }
     });
     const btn = document.getElementById('land-run');
@@ -77,19 +80,23 @@
 
     function draw(time) {
       const t = +slider.value / 100, { ctx: c, w, h } = setup(cv); c.clearRect(0, 0, w, h);
+      // kartu kertas di dalam pelat gelap
+      c.fillStyle = '#FFFDF6'; c.fillRect(0, 0, w, h);
+      c.strokeStyle = 'rgba(41,35,23,.22)'; c.lineWidth = 1; c.strokeRect(3.5, 3.5, w - 7, h - 7);
       const cx = w * 0.62, cy = h * 0.5, R0 = Math.min(w, h) * 0.46, R = R0 * Math.pow(1 - t, 1.8) + 5;
       // lingkaran area pencarian
-      c.strokeStyle = 'rgba(56,189,248,.35)'; c.setLineDash([5, 5]); c.beginPath(); c.arc(cx, cy, R, 0, 6.283); c.stroke(); c.setLineDash([]);
-      const gr = c.createRadialGradient(cx, cy, 0, cx, cy, R); gr.addColorStop(0, 'rgba(56,189,248,.18)'); gr.addColorStop(1, 'rgba(56,189,248,0)');
+      c.strokeStyle = 'rgba(41,35,23,.45)'; c.setLineDash([5, 5]); c.beginPath(); c.arc(cx, cy, R, 0, 6.283); c.stroke(); c.setLineDash([]);
+      const gr = c.createRadialGradient(cx, cy, 0, cx, cy, R); gr.addColorStop(0, 'rgba(180,83,9,.18)'); gr.addColorStop(1, 'rgba(180,83,9,0)');
       c.fillStyle = gr; c.beginPath(); c.arc(cx, cy, R, 0, 6.283); c.fill();
       for (const s of seeds) {
         const wob = Math.sin(time / 600 * s.s + s.p) * 3;
         const x = cx + Math.cos(s.a) * s.r * R + wob, y = cy + Math.sin(s.a) * s.r * R + Math.cos(time / 700 * s.s + s.p) * 3;
-        dot(c, x, y, 4, '#38bdf8', 'rgba(255,255,255,.4)', '#38bdf8');
+        dot(c, x, y, 4, '#0F766E', '#FFFDF6');
       }
-      star(c, cx, cy, 11, '#fbbf24', '#fbbf24');
-      c.fillStyle = 'rgba(226,232,240,.7)'; c.font = '11px "JetBrains Mono"'; c.textAlign = 'left';
+      star(c, cx, cy, 11, '#D97706', 'rgba(217,119,6,.45)');
+      c.fillStyle = 'rgba(41,35,23,.8)'; c.font = '600 11px "JetBrains Mono"'; c.textAlign = 'left';
       c.fillText('solusi terbaik', cx + 14, cy - 12);
+      c.fillStyle = 'rgba(41,35,23,.65)';
       c.fillText(t < 0.35 ? 'FASE: EKSPLORASI — agen menyebar luas' : t < 0.7 ? 'FASE: PERALIHAN' : 'FASE: EKSPLOITASI — agen merapat', 12, 20);
       bar.style.width = t * 100 + '%'; bar.style.display = 'block';
       tv.textContent = Math.round(t * 100);
