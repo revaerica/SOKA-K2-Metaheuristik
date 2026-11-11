@@ -52,7 +52,7 @@
   (function () {
     const cvC = $('cv-conv'), cvG = $('cv-gantt'), ids = ['ar-t', 'ar-v', 'ar-it', 'ar-n'];
     let P, seed = 5, A = null, running = false, sel = 'alo', per = 1, started = false;
-    const COL = { alo: '#fbbf24', goa: '#34d399', malo: '#f472b6', rnd: '#64748b' }, NAME = { alo: 'ALO', goa: 'GOA', malo: 'MALO-ringkas', rnd: 'Random', rr: 'Round-Robin' };
+    const COL = { alo: '#FFB020', goa: '#3AD9C3', malo: '#FF7A66', rnd: '#64748b' }, NAME = { alo: 'ALO', goa: 'GOA', malo: 'MALO-ringkas', rnd: 'Random', rr: 'Round-Robin' };
     const val = id => +$(id).value;
     function labels() { ids.forEach(i => $(i + 'v').textContent = $(i).value); }
 

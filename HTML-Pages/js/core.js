@@ -58,42 +58,61 @@ window.MH = (function () {
   }
   const rastriginN = x => rastrigin2(x[0], x[1]);
 
-  function makeHeat(fn, lb, ub, res = 150) {
-    const c = document.createElement('canvas'); c.width = c.height = res;
-    const g = c.getContext('2d'); const im = g.createImageData(res, res);
-    const vals = new Float32Array(res * res); let mx = 0;
-    for (let j = 0; j < res; j++) for (let i = 0; i < res; i++) {
-      const v = fn(lb + ((i + 0.5) / res) * (ub - lb), ub - ((j + 0.5) / res) * (ub - lb));
-      vals[j * res + i] = v; if (v > mx) mx = v;
-    }
-    const st = [[6, 9, 26], [16, 40, 96], [12, 112, 140], [40, 205, 185], [250, 208, 80]];
-    for (let k = 0; k < vals.length; k++) {
-      const q = vals[k] / mx, t = Math.pow(q, 0.85), p = t * (st.length - 1);
-      const a = Math.min(Math.floor(p), st.length - 2), f = p - a;
-      let r = lerp(st[a][0], st[a + 1][0], f), gg = lerp(st[a][1], st[a + 1][1], f), b = lerp(st[a][2], st[a + 1][2], f);
-      if ((q * 14) % 1 < 0.07) { r *= 0.72; gg *= 0.72; b *= 0.72; } // garis kontur
-      im.data[k * 4] = r; im.data[k * 4 + 1] = gg; im.data[k * 4 + 2] = b; im.data[k * 4 + 3] = 255;
-    }
-    g.putImageData(im, 0, 0);
-    return c;
-  }
+  /* ---------- panggung three.js (permukaan fitness + kamera orbit) ---------- */
+  function make3D(cv, fn, lb, ub, o = {}) {
+    if (!window.THREE) throw new Error('three.js belum dimuat');
+    const G = o.G || 64, cx = (lb + ub) / 2, R = (ub - lb) / 2, H = R * 0.42;
+    const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x14113a);
+    scene.fog = new THREE.Fog(0x14113a, R * 3.4, R * 8.5);
+    const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 500);
+    camera.position.set(R * 1.5, R * 1.55, R * 2.2);
+    scene.add(new THREE.HemisphereLight(0xfff8ec, 0x3a34a8, 0.8));
+    const sun = new THREE.DirectionalLight(0xffffff, 0.7);
+    sun.position.set(-R, R * 1.6, R * 0.9); scene.add(sun);
+    const controls = new THREE.OrbitControls(camera, cv);
+    controls.target.set(0, H * 0.35, 0);
+    controls.enableDamping = true; controls.dampingFactor = 0.08;
+    controls.autoRotate = true; controls.autoRotateSpeed = 0.8;
+    controls.minDistance = R * 0.9; controls.maxDistance = R * 4.5;
+    controls.maxPolarAngle = Math.PI * 0.48;
+    controls.update();
 
-  class Plot2D {
-    constructor(cv, fn, lb, ub) { this.cv = cv; this.lb = lb; this.ub = ub; this.heat = makeHeat(fn, lb, ub); }
-    begin() {
-      const s = setup(this.cv);
-      this.ctx = s.ctx; this.w = s.w; this.h = s.h;
-      this.size = Math.min(s.w, s.h); this.ox = (s.w - this.size) / 2; this.oy = (s.h - this.size) / 2;
-      const c = this.ctx; c.clearRect(0, 0, this.w, this.h);
-      c.imageSmoothingEnabled = true;
-      c.drawImage(this.heat, this.ox, this.oy, this.size, this.size);
-      c.strokeStyle = 'rgba(255,255,255,.18)'; c.lineWidth = 1;
-      c.strokeRect(this.ox + .5, this.oy + .5, this.size - 1, this.size - 1);
-      return c;
+    // permukaan: PlaneGeometry di-displace per-vertex sesuai fn, warna per-vertex
+    const geo = new THREE.PlaneGeometry(2 * R, 2 * R, G, G);
+    geo.rotateX(-Math.PI / 2);
+    const pos = geo.attributes.position;
+    const fs = new Float32Array(pos.count); let fmin = 1e9, fmax = -1e9;
+    for (let i = 0; i < pos.count; i++) {
+      const fx = pos.getX(i) + cx, fz = pos.getZ(i) + cx, f = fn(fx, fz);
+      fs[i] = f; if (f < fmin) fmin = f; if (f > fmax) fmax = f;
     }
-    px(x) { return this.ox + ((x - this.lb) / (this.ub - this.lb)) * this.size; }
-    py(y) { return this.oy + (1 - (y - this.lb) / (this.ub - this.lb)) * this.size; }
-    len(d) { return (d / (this.ub - this.lb)) * this.size; }
+    const cols = new Float32Array(pos.count * 3);
+    const lo = new THREE.Color(0xe8c98e), hi = new THREE.Color(0xfaf5e8);
+    for (let i = 0; i < pos.count; i++) {
+      const t = (fs[i] - fmin) / (fmax - fmin);
+      pos.setY(i, t * H);
+      const c = lo.clone().lerp(hi, Math.pow(t, 0.8));
+      cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    geo.computeVertexNormals();
+    const plate = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0, side: THREE.DoubleSide }));
+    scene.add(plate);
+    // plinth gelap di bawah permukaan
+    const plinth = new THREE.Mesh(new THREE.BoxGeometry(2 * R + 1.2, H + 1.6, 2 * R + 1.2), new THREE.MeshStandardMaterial({ color: 0x232063, roughness: 0.9 }));
+    plinth.position.y = -H / 2 - 0.8; scene.add(plinth);
+
+    function resize() {
+      const r = cv.getBoundingClientRect(), w = Math.max(10, r.width), h = Math.max(10, r.height);
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    addEventListener('resize', resize); resize();
+    const heightAt = (x, z) => ((fn(x, z) - fmin) / (fmax - fmin)) * H;
+    function render() { controls.update(); renderer.render(scene, camera); }
+    return { scene, camera, renderer, controls, render, resize, heightAt, worldX: x => x - cx, worldZ: y => y - cx, R, H, THREE };
   }
 
   function dot(c, x, y, r, fill, stroke, glow) {
@@ -276,7 +295,7 @@ window.MH = (function () {
   const schedFit = p => x => evalSched(p, decode(p, x)).mk;
   const roundRobin = p => Array.from({ length: p.nT }, (_, j) => j % p.nV);
 
-  const PAL = ['#38bdf8', '#fbbf24', '#34d399', '#f472b6', '#a78bfa', '#fb923c', '#2dd4bf', '#f87171', '#a3e635', '#60a5fa', '#e879f9', '#facc15'];
+  const PAL = ['#FFB020', '#3AD9C3', '#FF7A66', '#A78BFA', '#FFD75E', '#63E6A8', '#FF8A3D', '#C4B5FD', '#FF9E8E', '#2DD4BF', '#E86F8F', '#8FA8FF'];
 
   function drawGantt(cv, p, a, opt = {}) {
     const { ctx: c, w, h } = setup(cv); c.clearRect(0, 0, w, h);
@@ -322,6 +341,6 @@ window.MH = (function () {
     }
   }
 
-  return { clamp, rnd, lerp, ease, mulberry, setup, onSlide, emit, loop, rastrigin2, rastriginN, SHIFT, Plot2D, dot, star, tri,
+  return { clamp, rnd, lerp, ease, mulberry, setup, onSlide, emit, loop, rastrigin2, rastriginN, SHIFT, make3D, dot, star, tri,
     ALO, MALO, GOA, RandomSearch, makeProblem, decode, evalSched, schedFit, roundRobin, drawGantt, drawLines, PAL };
 })();
